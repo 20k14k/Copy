@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copy By Karan Kushwaha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 18px;
+        }
+
+        .flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            justify-content: flex-start;
+            align-items: flex-start;
+            overflow: scroll;
+            width: 100vw;
+            height: 100vh;
+            background-color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+            background-color: black;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.662);
+        }
+
+        .wrapper {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .copycover {
+            width: 1300px;
+            height: 731px;
+            background-color: rgb(55, 159, 250);
+            border: rgb(202, 202, 202) solid 2px;
+            border-radius: 20px;
+            box-shadow: 0px 10px 14px rgba(0, 0, 0, 0.543);
+            justify-content: space-evenly;
+        }
+
+        .page {
+            width: 600px;
+            height: 631px;
+            background-color: white;
+            border: black solid 1px;
+            box-shadow: 0px 10px 13px rgba(0, 0, 0, 0.518);
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .margin1,
+        .margin2 {
+            position: absolute;
+            top: 0;
+            left: 50px;
+            height: 631px;
+            border: solid 1px rgb(255, 22, 61);
+        }
+
+        .margin2 {
+            left: 53px;
+        }
+
+        .margin3,
+        .margin4 {
+            position: absolute;
+            top: 50px;
+            left: 0px;
+            width: 600px;
+            border: solid 1px rgb(255, 22, 61);
+        }
+
+        .margin4 {
+            top: 53px;
+            border: solid 1px rgb(255, 22, 61);
+        }
+
+
+        .pagebody {
+            position: absolute;
+            top: 54px;
+            left: 0;
+            width: 600px;
+            height: 631px;
+        }
+
+        .pagebody hr {
+            width: 600px;
+            border: solid 1px black;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container flex">
+        <div class="wrapper flex">
+            <button id="penButton">Pen</button>
+            <button id="eraserButton">Eraser</button>
+            <div class="copycover flex">
+                <div class="page left  flex">
+                    <div class="pagebody">
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                    </div>
+                    <hr class="margin1">
+                    <hr class="margin2">
+                    <hr class="margin3">
+                    <hr class="margin4">
+                    <canvas id="drawingCanvas1" width="600" height="631"></canvas>
+                </div>
+                <div class="page right flex">
+                    <div class="pagebody">
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                        <hr>
+                    </div>
+                    <hr class="margin1">
+                    <hr class="margin2">
+                    <hr class="margin3">
+                    <hr class="margin4">
+                    <canvas id="drawingCanvas2" width="600" height="631"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const canvas1 = document.getElementById("drawingCanvas1");
+const ctx1 = canvas1.getContext("2d");
+let isDrawing1 = false;
+
+const canvas2 = document.getElementById("drawingCanvas2");
+const ctx2 = canvas2.getContext("2d");
+let isDrawing2 = false;
+
+const penButton = document.getElementById("penButton");
+const eraserButton = document.getElementById("eraserButton");
+let isPenMode = true; // Initially, set the pen mode as active
+
+canvas1.addEventListener("mousedown", startDrawing);
+canvas1.addEventListener("mousemove", draw);
+canvas1.addEventListener("mouseup", stopDrawing);
+canvas1.addEventListener("touchstart", startDrawing);
+canvas1.addEventListener("touchmove", draw);
+canvas1.addEventListener("touchend", stopDrawing);
+
+canvas2.addEventListener("mousedown", startDrawing);
+canvas2.addEventListener("mousemove", draw);
+canvas2.addEventListener("mouseup", stopDrawing);
+canvas2.addEventListener("touchstart", startDrawing);
+canvas2.addEventListener("touchmove", draw);
+canvas2.addEventListener("touchend", stopDrawing);
+
+penButton.addEventListener("click", () => {
+    isPenMode = true;
+    canvas1.style.cursor = "default"; // Set cursor back to the default cursor for pen mode
+    canvas2.style.cursor = "default"; // Set cursor back to the default cursor for pen mode
+});
+
+eraserButton.addEventListener("click", () => {
+    isPenMode = false;
+    canvas1.style.cursor = "crosshair"; // Set cursor as a crosshair for eraser mode
+    canvas2.style.cursor = "crosshair"; // Set cursor as a crosshair for eraser mode
+    clearCanvas(); // Clear the canvas when switching to eraser mode
+});
+
+function startDrawing(e) {
+    isDrawing1 = e.target === canvas1;
+    isDrawing2 = e.target === canvas2;
+    draw(e);
+}
+
+function draw(e) {
+    if (!isDrawing1 && !isDrawing2) return;
+
+    const canvas = isDrawing1 ? canvas1 : canvas2;
+    const ctx = isDrawing1 ? ctx1 : ctx2;
+    const lineWidth = 2; // You can adjust the line width
+    const lineCap = "round";
+    const strokeStyle = isPenMode ? "black" : "white"; // Use white color for eraser
+
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = lineCap;
+    ctx.strokeStyle = strokeStyle;
+
+    if (e.type === "touchmove") {
+        e.preventDefault();
+        const touch = e.touches[0];
+        ctx.lineTo(touch.clientX - canvas.getBoundingClientRect().left, touch.clientY - canvas.getBoundingClientRect().top);
+    } else {
+        ctx.lineTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - canvas.getBoundingClientRect().left, e.clientY - canvas.getBoundingClientRect().top);
+}
+
+function stopDrawing() {
+    isDrawing1 = false;
+    isDrawing2 = false;
+    ctx1.beginPath();
+    ctx2.beginPath();
+}
+
+function clearCanvas() {
+    ctx1.clearRect(0, 0, canvas1.width, canvas1.height);
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height);
+}
+
+</script>
+
+</body>
+
+</html>
